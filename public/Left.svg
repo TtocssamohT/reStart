@@ -1,0 +1,21 @@
+<svg width="160" height="120" xmlns="http://www.w3.org/2000/svg">
+  <!-- Define directional buttons -->
+  <!-- First row -->
+  <rect x="0" y="0" width="40" height="40" fill="#FF3300"/> <!-- Pixel 1 -->
+  <rect x="40" y="0" width="40" height="40" fill="#1DA1F2"/> <!-- Pixel 2 -->
+  <rect x="80" y="0" width="40" height="40" fill="#FF3300"/> <!-- Pixel 3 -->
+  <rect x="120" y="0" width="40" height="40" fill="#ff3300"/> <!-- Pixel 4 -->
+  
+  <!-- Second row -->
+  <rect x="0" y="40" width="40" height="40" fill="#1DA1F2"/> <!-- Pixel 5 -->
+  <rect x="40" y="40" width="40" height="40" fill="#FF3300"/> <!-- Pixel 6 -->
+  <rect x="100" y="40" width="20" height="40" fill="#1DA1F2"/> <!-- Pixel 7 -->
+   <rect x="80" y="40" width="20" height="40" fill="#ff3300"/> <!-- Pixel 7 -->
+  <rect x="120" y="40" width="40" height="40" fill="#1DA1F2"/> <!-- Pixel 8 -->
+  
+  <!-- Third row -->
+  <rect x="0" y="80" width="40" height="40" fill="#FF3300"/> <!-- Pixel 9 -->
+  <rect x="40" y="80" width="40" height="40" fill="#1DA1F2"/> <!-- Pixel 10 -->
+  <rect x="80" y="80" width="40" height="40" fill="#FF3300"/> <!-- Pixel 11 -->
+  <rect x="120" y="80" width="40" height="40" fill="#ff3300"/> <!-- Pixel 12 -->
+</svg>
