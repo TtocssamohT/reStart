@@ -202,7 +202,28 @@
         let timeout = 100;
     
         document.addEventListener('keydown', changeDirection);
-    
+
+        // Swipe gesture variables
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let touchEndX = 0;
+        let touchEndY = 0;
+
+        // Add touch event listeners for swipe gestures
+        document.addEventListener('touchstart', function(event) {
+            touchStartX = event.changedTouches[0].screenX;
+            touchStartY = event.changedTouches[0].screen
+                    changeDirection({ key: 'ArrowLeft' });
+                }
+            } else {
+                if (diffY > 0) {
+                    changeDirection({ key: 'ArrowDown' });
+                } else {
+                    changeDirection({ key: 'ArrowUp' });
+                }
+            }
+        }
+
         function gameLoop() {
             updateSnakePosition();
             if (checkCollision()) {
@@ -213,7 +234,6 @@
                     score++;
                     snake.push({...snake[snake.length - 1]});
                     food = getRandomFoodPosition();
-    
                 }
                 drawGame();
                 scoreDisplay.textContent = score;
@@ -221,18 +241,18 @@
                 setTimeout(gameLoop, timeout);
             }
         }
-    
+
         function updateSnakePosition() {
             const newHead = {x: snake[0].x + direction.x, y: snake[0].y + direction.y};
             snake.unshift(newHead);
             snake.pop();
         }
-    
+
         function changeDirection(event) {
             event.preventDefault(); // Prevent default behavior (e.g., scrolling)
-    
+
             let key = event.key; // Get the key from the event object
-    
+
             switch(key) {
                 case 'ArrowUp':
                     if (direction.y === 0) {
@@ -260,7 +280,7 @@
                     break;
             }
         }
-    
+
         function checkCollision() {
             for (let i = 1; i < snake.length; i++) {
                 if (snake[i].x === snake[0].x && snake[i].y === snake[0].y) {
@@ -272,14 +292,14 @@
             }
             return false;
         }
-    
+
         function checkFoodCollision() {
             if (snake[0].x === food.x && snake[0].y === food.y) {
                 return true;
             }
             return false;
         }
-    
+
         function getRandomFoodPosition() {
             let position;
             do {
@@ -290,12 +310,12 @@
             } while (snake.some(segment => segment.x === position.x && segment.y === position.y));
             return position;
         }
-    
+
         function drawGame() {
             // Fill the game canvas with the desired background color
             context.fillStyle = "#0099cc";
             context.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
-    
+
             context.beginPath();
             context.moveTo(1, 1); // Start slightly inside the canvas
             context.lineTo(1, canvasSize);
@@ -303,7 +323,7 @@
             context.lineTo(canvasSize, 1);
             context.closePath();
             context.stroke();
-    
+
             // Draw the pixel borders around the grid
             context.strokeStyle = "rgba(255, 255, 255, 0.1)"; // Set pixel border color
             context.lineWidth = 1; // Set the line width for pixel borders
@@ -312,7 +332,7 @@
                     context.strokeRect(i * gridSize, j * gridSize, gridSize, gridSize);
                 }
             }
-    
+
             // Draw the snake
             context.lineWidth = 1; // Reset line width for snake and eyes
             snake.forEach((segment, index) => {
@@ -320,7 +340,7 @@
                     // Draw eyes for the first segment
                     context.fillStyle = 'lime';
                     context.fillRect(segment.x, segment.y, gridSize, gridSize);
-    
+
                     // Draw eyes (black pixels)
                     context.fillStyle = 'black';
                     context.fillRect(segment.x + 3, segment.y + 3, 4, 4); // Eye 1
@@ -331,12 +351,12 @@
                     context.fillRect(segment.x, segment.y, gridSize, gridSize);
                 }
             });
-    
+
             // Draw the food
             context.fillStyle = '#ff3300'; // Set the color to #ff3300
             context.fillRect(food.x, food.y, gridSize, gridSize);
         }
-    
+
         function resetGame() {
             snake = [{x: gridCount / 2 * gridSize, y: gridCount / 2 * gridSize}];
             direction = {x: 0, y: 0};
@@ -345,21 +365,21 @@
             moves = 0;
             timeout = 100;
         }
-    
+
         function refreshGame() {
             refreshBackground();
             resetGame();
             drawGame();
             gameLoop();
         }
-    
+
         function restartGame() {
             resetGame();
             drawGame();
             gameLoop();
             document.addEventListener('keydown', changeDirection); // Re-add event listener
         }
-    
+
         refreshBackground();
         drawGame();
         gameLoop();
