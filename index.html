@@ -48,7 +48,6 @@
             margin-top: auto; /* Push footer to the bottom of the container */
         }
 
-   
         .refresh-button {
             font-size: 25px; /* Adjusted font size */
             font-weight: bold;
@@ -113,7 +112,15 @@
             position: relative; /* Ensure proper stacking context */
             z-index: 2; /* Ensure container is above the rain canvas */
         }
+        .direction-button-UD img {
+            width: 20px; /* Adjust the width */
+            height: 40px; /* Adjust the height */
+        }
 
+        .direction-button-LR img {
+            width: 60px; /* Adjust the width */
+            height: 50px; /* Adjust the height */
+        }
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -124,10 +131,7 @@
         <canvas id="pixelCanvas" style="position: fixed; top: 0; left: 0; pointer-events: none; z-index: -1;"></canvas>
     
         <div class="container">
-            <div class="item header">
-                <img src="https://ipfs.io/ipfs/Qmd7HJq9negUL9b8GSXsF1bJkkPeVWFtTzV7WAtqV6gQGV" alt="Description of the image" style="width: 100%;">
-            </div>
-            
+                       
             <div class="item">
                 <button class="refresh-button" onclick="refreshGame()">reFresh</button>
                 <button class="restart-button refresh-button" onclick="restartGame()">reStart</button>
@@ -138,52 +142,47 @@
                     Score: <span id="score">0</span>
                 </div>
                 <div style="font-family: 'Pixelify Sans', sans-serif; font-size: 24px; color: #0099cc; font-weight: bold;">
-                    reDirections: <span id="moves">0</span>
+                    reDiretions: <span id="moves">0</span>
                 </div>
+                
             </button>
+               
             
             <div style="height: 20px;"></div> <!-- Buffer above Magmascan link -->
             <div class="item" style="display: flex; flex-direction: column; align-items: center;">
                
                 <canvas id="gameCanvas" width="400" height="400"></canvas>
                 <div style="height: 20px;"></div> <!-- Buffer above Magmascan link -->
-                <iframe src="https://embed.ipfscdn.io/ipfs/bafybeicd3qfzelz4su7ng6n523virdsgobrc5pcbarhwqv3dj3drh645pi/?contract=0x744556F5ec8c78757eeE117683f5E6188A1e757f&chain=%7B%22name%22%3A%22Magma%3AOnyx%22%2C%22chain%22%3A%22%22%2C%22rpc%22%3A%5B%22https%3A%2F%2Fturbo.magma-rpc.com%22%5D%2C%22nativeCurrency%22%3A%7B%22symbol%22%3A%22Lava%22%2C%22name%22%3A%22Lava%22%2C%22decimals%22%3A18%7D%2C%22shortName%22%3A%22magmaonyx%22%2C%22chainId%22%3A6969696969%2C%22testnet%22%3Afalse%2C%22slug%22%3A%22magmaonyx%22%2C%22icon%22%3A%7B%22url%22%3A%22%22%2C%22width%22%3A50%2C%22height%22%3A50%2C%22format%22%3A%22%22%7D%7D&clientId=b4d55fcd816e88253fe6f65c17b0d0a4&theme=dark&primaryColor=teal" width="700px" height="700px" style="max-width:80%; position: relative; z-index: 2;" frameborder="0"></iframe>
-            </div>
-              
-            <div class="item" style="position: relative; z-index: 2;">
-                <div style="height: 20px;"></div> <!-- Buffer above Magmascan link -->
-                <a href="https://magmascan.org/token/0x744556F5ec8c78757eeE117683f5E6188A1e757f" class="magmascan-link">Magmascan</a>
-            </div>
+           
+            
+           
         </div> 
     </div>
     
-
-
-
     <script>
         // Background refresh function
         function refreshBackground() {
             let canvas = document.createElement('canvas');
-           
+    
             canvas.width = 700;
             canvas.height = 700;
             let ctx = canvas.getContext('2d');
-
+    
             ctx.fillStyle = "black";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-
+    
             for (let i = 0; i < 100; i++) {
                 for (let j = 0; j < 100; j++) {
                     let randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
                     ctx.fillStyle = randomColor;
-                    ctx.fillRect(j * 7 + 1, i * 7 + 1, 5, 5); 
+                    ctx.fillRect(j * 7 + 1, i * 7 + 1, 5, 5);
                 }
             }
-
+    
             let imageDataURL = canvas.toDataURL('image/png');
             document.body.style.backgroundImage = `url(${imageDataURL})`;
         }
-
+    
         // PhixelSnake game setup
         const gameCanvas = document.getElementById('gameCanvas');
         const context = gameCanvas.getContext('2d');
@@ -192,7 +191,7 @@
         const canvasSize = gridSize * gridCount;
         gameCanvas.width = canvasSize;
         gameCanvas.height = canvasSize;
-
+    
         let snake = [{x: gridCount / 2 * gridSize, y: gridCount / 2 * gridSize}];
         let direction = {x: 0, y: 0};
         let food = getRandomFoodPosition();
@@ -201,9 +200,9 @@
         let scoreDisplay = document.getElementById('score');
         let movesDisplay = document.getElementById('moves');
         let timeout = 100;
-
+    
         document.addEventListener('keydown', changeDirection);
-
+    
         function gameLoop() {
             updateSnakePosition();
             if (checkCollision()) {
@@ -214,6 +213,7 @@
                     score++;
                     snake.push({...snake[snake.length - 1]});
                     food = getRandomFoodPosition();
+    
                 }
                 drawGame();
                 scoreDisplay.textContent = score;
@@ -221,16 +221,19 @@
                 setTimeout(gameLoop, timeout);
             }
         }
-
+    
         function updateSnakePosition() {
             const newHead = {x: snake[0].x + direction.x, y: snake[0].y + direction.y};
             snake.unshift(newHead);
             snake.pop();
         }
-
+    
         function changeDirection(event) {
-            event.preventDefault(); // Prevent default arrow key behavior (scrolling)
-            switch(event.key) {
+            event.preventDefault(); // Prevent default behavior (e.g., scrolling)
+    
+            let key = event.key; // Get the key from the event object
+    
+            switch(key) {
                 case 'ArrowUp':
                     if (direction.y === 0) {
                         direction = {x: 0, y: -gridSize};
@@ -257,7 +260,7 @@
                     break;
             }
         }
-
+    
         function checkCollision() {
             for (let i = 1; i < snake.length; i++) {
                 if (snake[i].x === snake[0].x && snake[i].y === snake[0].y) {
@@ -269,14 +272,14 @@
             }
             return false;
         }
-
+    
         function checkFoodCollision() {
             if (snake[0].x === food.x && snake[0].y === food.y) {
                 return true;
             }
             return false;
         }
-
+    
         function getRandomFoodPosition() {
             let position;
             do {
@@ -287,55 +290,53 @@
             } while (snake.some(segment => segment.x === position.x && segment.y === position.y));
             return position;
         }
- 
+    
         function drawGame() {
-    // Fill the game canvas with the desired background color
-    context.fillStyle = "#0099cc";
-    context.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
-
-    context.beginPath();
-context.moveTo(1, 1); // Start slightly inside the canvas
-context.lineTo(1, canvasSize);
-context.lineTo(canvasSize, canvasSize);
-context.lineTo(canvasSize, 1);
-context.closePath();
-context.stroke();
-
-
-    // Draw the pixel borders around the grid
-    context.strokeStyle = "rgba(255, 255, 255, 0.1)"; // Set pixel border color
-    context.lineWidth = 1; // Set the line width for pixel borders
-    for (let i = 0; i < gridCount; i++) {
-        for (let j = 0; j < gridCount; j++) {
-            context.strokeRect(i * gridSize, j * gridSize, gridSize, gridSize);
+            // Fill the game canvas with the desired background color
+            context.fillStyle = "#0099cc";
+            context.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
+    
+            context.beginPath();
+            context.moveTo(1, 1); // Start slightly inside the canvas
+            context.lineTo(1, canvasSize);
+            context.lineTo(canvasSize, canvasSize);
+            context.lineTo(canvasSize, 1);
+            context.closePath();
+            context.stroke();
+    
+            // Draw the pixel borders around the grid
+            context.strokeStyle = "rgba(255, 255, 255, 0.1)"; // Set pixel border color
+            context.lineWidth = 1; // Set the line width for pixel borders
+            for (let i = 0; i < gridCount; i++) {
+                for (let j = 0; j < gridCount; j++) {
+                    context.strokeRect(i * gridSize, j * gridSize, gridSize, gridSize);
+                }
+            }
+    
+            // Draw the snake
+            context.lineWidth = 1; // Reset line width for snake and eyes
+            snake.forEach((segment, index) => {
+                if (index === 0) {
+                    // Draw eyes for the first segment
+                    context.fillStyle = 'lime';
+                    context.fillRect(segment.x, segment.y, gridSize, gridSize);
+    
+                    // Draw eyes (black pixels)
+                    context.fillStyle = 'black';
+                    context.fillRect(segment.x + 3, segment.y + 3, 4, 4); // Eye 1
+                    context.fillRect(segment.x + 13, segment.y + 3, 4, 4); // Eye 2
+                } else {
+                    // Draw the rest of the snake segments with a thinner outline
+                    context.fillStyle = 'lime';
+                    context.fillRect(segment.x, segment.y, gridSize, gridSize);
+                }
+            });
+    
+            // Draw the food
+            context.fillStyle = '#ff3300'; // Set the color to #ff3300
+            context.fillRect(food.x, food.y, gridSize, gridSize);
         }
-    }
-
-    // Draw the snake
-    context.lineWidth = 1; // Reset line width for snake and eyes
-    snake.forEach((segment, index) => {
-        if (index === 0) {
-            // Draw eyes for the first segment
-            context.fillStyle = 'lime';
-            context.fillRect(segment.x, segment.y, gridSize, gridSize);
-
-            // Draw eyes (black pixels)
-            context.fillStyle = 'black';
-            context.fillRect(segment.x + 3, segment.y + 3, 4, 4); // Eye 1
-            context.fillRect(segment.x + 13, segment.y + 3, 4, 4); // Eye 2
-        } else {
-            // Draw the rest of the snake segments with a thinner outline
-            context.fillStyle = 'lime';
-            context.fillRect(segment.x, segment.y, gridSize, gridSize);
-        }
-    });
-
-    // Draw the food
-    context.fillStyle = '#ff3300'; // Set the color to #ff3300
-    context.fillRect(food.x, food.y, gridSize, gridSize);
-}
-
-
+    
         function resetGame() {
             snake = [{x: gridCount / 2 * gridSize, y: gridCount / 2 * gridSize}];
             direction = {x: 0, y: 0};
@@ -344,24 +345,25 @@ context.stroke();
             moves = 0;
             timeout = 100;
         }
-
+    
         function refreshGame() {
             refreshBackground();
             resetGame();
             drawGame();
             gameLoop();
         }
-
+    
         function restartGame() {
             resetGame();
             drawGame();
             gameLoop();
             document.addEventListener('keydown', changeDirection); // Re-add event listener
         }
-
+    
         refreshBackground();
         drawGame();
         gameLoop();
     </script>
+    
 </body>
 </html>
