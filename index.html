@@ -211,53 +211,49 @@
         gameCanvas.addEventListener('touchmove', handleTouchMove, false);
     
         function handleTouchStart(evt) {
-            console.log('Touch start detected');
-            const touch = evt.touches[0];
-            touchStartX = touch.clientX;
-            touchStartY = touch.clientY;
+    const touch = evt.touches[0];
+    touchStartX = touch.clientX;
+    touchStartY = touch.clientY;
+    evt.preventDefault(); // Prevent default behavior (e.g., scrolling)
+}
+
+function handleTouchMove(evt) {
+    if (!touchStartX || !touchStartY) {
+        return;
+    }
+
+    const touch = evt.touches[0];
+    const touchEndX = touch.clientX;
+    const touchEndY = touch.clientY;
+
+    const diffX = touchStartX - touchEndX;
+    const diffY = touchStartY - touchEndY;
+
+    if (Math.abs(diffX) > Math.abs(diffY)) {
+        if (diffX > 0) {
+            changeDirection({ key: 'ArrowLeft' });
+        } else {
+            changeDirection({ key: 'ArrowRight' });
         }
-    
-        function handleTouchMove(evt) {
-            console.log('Touch move detected');
-            if (!touchStartX || !touchStartY) {
-                return;
-            }
-    
-            const touch = evt.touches[0];
-            const touchEndX = touch.clientX;
-            const touchEndY = touch.clientY;
-    
-            const diffX = touchStartX - touchEndX;
-            const diffY = touchStartY - touchEndY;
-    
-            if (Math.abs(diffX) > Math.abs(diffY)) {
-                if (diffX > 0) {
-                    console.log('Swipe left detected');
-                    changeDirection({ key: 'ArrowLeft' });
-                } else {
-                    console.log('Swipe right detected');
-                    changeDirection({ key: 'ArrowRight' });
-                }
-            } else {
-                if (diffY > 0) {
-                    console.log('Swipe up detected');
-                    changeDirection({ key: 'ArrowUp' });
-                } else {
-                    console.log('Swipe down detected');
-                    changeDirection({ key: 'ArrowDown' });
-                }
-            }
-    
-            touchStartX = 0;
-            touchStartY = 0;
-    
-            // Start game loop on first touch move
-            if (!gameRunning) {
-                console.log('Starting game loop');
-                gameRunning = true;
-                gameLoop();
-            }
+    } else {
+        if (diffY > 0) {
+            changeDirection({ key: 'ArrowUp' });
+        } else {
+            changeDirection({ key: 'ArrowDown' });
         }
+    }
+
+    touchStartX = 0;
+    touchStartY = 0;
+    evt.preventDefault(); // Prevent default behavior (e.g., scrolling)
+
+    // Start game loop on first touch move
+    if (!gameRunning) {
+        gameRunning = true;
+        gameLoop();
+    }
+}
+
     
         function gameLoop() {
             updateSnakePosition();
