@@ -192,7 +192,7 @@
         gameCanvas.width = canvasSize;
         gameCanvas.height = canvasSize;
     
-        let snake = [{ x: gridCount / 2 * gridSize, y: gridCount / 2 * gridSize }];
+        let snake = [{ x: Math.floor(gridCount / 2) * gridSize, y: Math.floor(gridCount / 2) * gridSize }];
         let direction = { x: 0, y: 0 };
         let nextDirection = direction; // Variable to store the next direction
         let food = getRandomFoodPosition();
@@ -241,7 +241,7 @@
             clearTimeout(gameLoopTimeout); // Clear the previous timeout
             score = 0;
             moves = 0;
-            snake = [{ x: gridCount / 2 * gridSize, y: gridCount / 2 * gridSize }];
+            snake = [{ x: Math.floor(gridCount / 2) * gridSize, y: Math.floor(gridCount / 2) * gridSize }];
             direction = { x: 0, y: 0 };
             nextDirection = direction;
             food = getRandomFoodPosition();
