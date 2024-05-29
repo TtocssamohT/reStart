@@ -207,12 +207,13 @@
         let touchStartX = 0;
         let touchStartY = 0;
     
-        document.addEventListener('touchstart', handleTouchStart, false);
-        document.addEventListener('touchmove', handleTouchMove, false);
+        gameCanvas.addEventListener('touchstart', handleTouchStart, false);
+        gameCanvas.addEventListener('touchmove', handleTouchMove, false);
     
         function handleTouchStart(evt) {
-            touchStartX = evt.touches[0].clientX;
-            touchStartY = evt.touches[0].clientY;
+            const touch = evt.touches[0];
+            touchStartX = touch.clientX;
+            touchStartY = touch.clientY;
         }
     
         function handleTouchMove(evt) {
@@ -220,11 +221,12 @@
                 return;
             }
     
-            let touchEndX = evt.touches[0].clientX;
-            let touchEndY = evt.touches[0].clientY;
+            const touch = evt.touches[0];
+            const touchEndX = touch.clientX;
+            const touchEndY = touch.clientY;
     
-            let diffX = touchStartX - touchEndX;
-            let diffY = touchStartY - touchEndY;
+            const diffX = touchStartX - touchEndX;
+            const diffY = touchStartY - touchEndY;
     
             if (Math.abs(diffX) > Math.abs(diffY)) {
                 if (diffX > 0) {
