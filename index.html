@@ -194,6 +194,7 @@
     
         let snake = [{ x: gridCount / 2 * gridSize, y: gridCount / 2 * gridSize }];
         let direction = { x: 0, y: 0 };
+        let nextDirection = direction; // Variable to store the next direction
         let food = getRandomFoodPosition();
         let score = 0;
         let moves = 0;
@@ -202,6 +203,7 @@
         let timeout = 100;
         let gameRunning = false;
         let gameLoopTimeout;
+        let lastDirection = direction; // Track the last direction to determine reDirections
 
         // Touch controls
         function handleTouchStart(event) {
@@ -213,16 +215,16 @@
             const dy = touchY - snake[0].y;
 
             if (Math.abs(dx) > Math.abs(dy)) {
-                if (dx > 0) {
-                    direction = { x: gridSize, y: 0 };
-                } else {
-                    direction = { x: -gridSize, y: 0 };
+                if (dx > 0 && direction.x === 0) {
+                    nextDirection = { x: gridSize, y: 0 };
+                } else if (dx < 0 && direction.x === 0) {
+                    nextDirection = { x: -gridSize, y: 0 };
                 }
             } else {
-                if (dy > 0) {
-                    direction = { x: 0, y: gridSize };
-                } else {
-                    direction = { x: 0, y: -gridSize };
+                if (dy > 0 && direction.y === 0) {
+                    nextDirection = { x: 0, y: gridSize };
+                } else if (dy < 0 && direction.y === 0) {
+                    nextDirection = { x: 0, y: -gridSize };
                 }
             }
         }
@@ -241,9 +243,11 @@
             moves = 0;
             snake = [{ x: gridCount / 2 * gridSize, y: gridCount / 2 * gridSize }];
             direction = { x: 0, y: 0 };
+            nextDirection = direction;
             food = getRandomFoodPosition();
             scoreDisplay.textContent = score;
             movesDisplay.textContent = moves;
+            lastDirection = direction; // Reset lastDirection
             startGameLoop();
         }
 
@@ -266,16 +270,16 @@
         // Game loop function
         function gameLoop() {
             gameLoopTimeout = setTimeout(function() {
-                context.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+                drawGame();
 
                 // Move snake
+                direction = nextDirection; // Update direction
                 const newHead = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
                 snake.unshift(newHead);
 
                 // Check if snake eats the food
                 if (newHead.x === food.x && newHead.y === food.y) {
                     score++;
-                    moves++;
                     food = getRandomFoodPosition();
                 } else {
                     snake.pop();
@@ -288,38 +292,84 @@
                     return;
                 }
 
-                // Draw food
-                context.fillStyle = 'red';
-                context.fillRect(food.x, food.y, gridSize, gridSize);
-
-                // Draw snake
-                context.fillStyle = 'green';
-                snake.forEach(segment => context.fillRect(segment.x, segment.y, gridSize, gridSize));
-
+                // Update the score display
                 scoreDisplay.textContent = score;
+
+                // Update the moves display
                 movesDisplay.textContent = moves;
 
+                // Continue the game loop
                 if (gameRunning) {
                     gameLoop();
                 }
             }, timeout);
         }
 
+        // Draw game function
+        function drawGame() {
+            // Fill the game canvas with the desired background color
+            context.fillStyle = "#0099cc";
+            context.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
+
+            // Draw the grid
+            context.strokeStyle = "rgba(255, 255, 255, 0.1)";
+            context.lineWidth = 1;
+            for (let i = 0; i < gridCount; i++) {
+                for (let j = 0; j < gridCount; j++) {
+                    context.strokeRect(i * gridSize, j * gridSize, gridSize, gridSize);
+                }
+            }
+
+            // Draw the food
+            context.fillStyle = '#ffffff';
+            context.fillRect(food.x, food.y, gridSize, gridSize);
+
+            // Draw the snake
+            snake.forEach((segment, index) => {
+                if (index === 0) {
+                    context.fillStyle = 'lime';
+                    context.fillRect(segment.x, segment.y, gridSize, gridSize);
+                    // Draw eyes on the head
+                    context.fillStyle = 'black';
+                    context.fillRect(segment.x + 3, segment.y + 3, 4, 4); // Eye 1
+                    context.fillRect(segment.x + 13, segment.y + 3, 4, 4); // Eye 2
+                } else {
+                    context.fillStyle = 'lime';
+                    context.fillRect(segment.x, segment.y, gridSize, gridSize);
+                }
+            });
+        }
+
         // Event listeners for key controls
         window.addEventListener('keydown', function(event) {
             switch (event.key) {
                 case 'ArrowUp':
-                    if (direction.y === 0) direction = { x: 0, y: -gridSize };
+                    if (direction.y === 0) {
+                        nextDirection = { x: 0, y: -gridSize };
+                    }
                     break;
                 case 'ArrowDown':
-                    if (direction.y === 0) direction = { x: 0, y: gridSize };
+                    if (direction.y === 0) {
+                        nextDirection = { x: 0, y: gridSize };
+                    }
                     break;
                 case 'ArrowLeft':
-                    if (direction.x === 0) direction = { x: -gridSize, y: 0 };
+                    if (direction.x === 0) {
+                        nextDirection = { x: -gridSize, y: 0 };
+                    }
                     break;
                 case 'ArrowRight':
-                    if (direction.x === 0) direction = { x: gridSize, y: 0 };
+                    if (direction.x === 0) {
+                        nextDirection = { x: gridSize, y: 0 };
+                    }
                     break;
+            }
+
+            // Increment reDirections if the direction changes
+            if (nextDirection.x !== lastDirection.x || nextDirection.y !== lastDirection.y) {
+                moves++;
+                movesDisplay.textContent = moves;
+                lastDirection = nextDirection;
             }
         });
 
