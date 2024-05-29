@@ -201,233 +201,131 @@
         let movesDisplay = document.getElementById('moves');
         let timeout = 100;
         let gameRunning = false;
-    
-        document.addEventListener('keydown', changeDirection);
-    
-        let touchStartX = 0;
-        let touchStartY = 0;
-    
-        gameCanvas.addEventListener('touchstart', handleTouchStart, false);
-        gameCanvas.addEventListener('touchmove', handleTouchMove, false);
-    
-        function handleTouchStart(evt) {
-            console.log('Touch start detected');
-            const touch = evt.touches[0];
-            touchStartX = touch.clientX;
-            touchStartY = touch.clientY;
-        }
-    
-        function handleTouchMove(evt) {
-            console.log('Touch move detected');
-            if (!touchStartX || !touchStartY) {
-                return;
-            }
-    
-            const touch = evt.touches[0];
-            const touchEndX = touch.clientX;
-            const touchEndY = touch.clientY;
-    
-            const diffX = touchEndX - touchStartX;
-            const diffY = touchEndY - touchStartY;
-    
-            if (Math.abs(diffX) > Math.abs(diffY)) {
-                if (diffX > 0) {
-                    console.log('Swipe right detected');
-                    changeDirection({ key: 'ArrowRight' });
+        let gameLoopTimeout;
+
+        // Touch controls
+        function handleTouchStart(event) {
+            const touch = event.touches[0];
+            const touchX = touch.clientX - gameCanvas.offsetLeft;
+            const touchY = touch.clientY - gameCanvas.offsetTop;
+
+            const dx = touchX - snake[0].x;
+            const dy = touchY - snake[0].y;
+
+            if (Math.abs(dx) > Math.abs(dy)) {
+                if (dx > 0) {
+                    direction = { x: gridSize, y: 0 };
                 } else {
-                    console.log('Swipe left detected');
-                    changeDirection({ key: 'ArrowLeft' });
+                    direction = { x: -gridSize, y: 0 };
                 }
             } else {
-                if (diffY > 0) {
-                    console.log('Swipe down detected');
-                    changeDirection({ key: 'ArrowDown' });
+                if (dy > 0) {
+                    direction = { x: 0, y: gridSize };
                 } else {
-                    console.log('Swipe up detected');
-                    changeDirection({ key: 'ArrowUp' });
+                    direction = { x: 0, y: -gridSize };
                 }
             }
-    
-            touchStartX = 0;
-            touchStartY = 0;
-    
-            // Start game loop on first touch move
+        }
+
+        gameCanvas.addEventListener('touchstart', handleTouchStart);
+
+        // Refresh game function
+        function refreshGame() {
+            location.reload();
+        }
+
+        // Restart game function
+        function restartGame() {
+            clearTimeout(gameLoopTimeout); // Clear the previous timeout
+            score = 0;
+            moves = 0;
+            snake = [{ x: gridCount / 2 * gridSize, y: gridCount / 2 * gridSize }];
+            direction = { x: 0, y: 0 };
+            food = getRandomFoodPosition();
+            scoreDisplay.textContent = score;
+            movesDisplay.textContent = moves;
+            startGameLoop();
+        }
+
+        // Function to get a random position for the food
+        function getRandomFoodPosition() {
+            return {
+                x: Math.floor(Math.random() * gridCount) * gridSize,
+                y: Math.floor(Math.random() * gridCount) * gridSize
+            };
+        }
+
+        // Function to start the game loop
+        function startGameLoop() {
             if (!gameRunning) {
-                console.log('Starting game loop');
                 gameRunning = true;
                 gameLoop();
             }
         }
-    
+
+        // Game loop function
         function gameLoop() {
-            updateSnakePosition();
-            if (checkCollision()) {
-                alert(`Game over! Your score is ${score} and you made ${moves} moves.`);
-                resetGame();
-            } else {
-                if (checkFoodCollision()) {
+            gameLoopTimeout = setTimeout(function() {
+                context.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+
+                // Move snake
+                const newHead = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
+                snake.unshift(newHead);
+
+                // Check if snake eats the food
+                if (newHead.x === food.x && newHead.y === food.y) {
                     score++;
-                    snake.push({ ...snake[snake.length - 1] });
+                    moves++;
                     food = getRandomFoodPosition();
+                } else {
+                    snake.pop();
                 }
-                drawGame();
+
+                // Check for collisions
+                if (newHead.x < 0 || newHead.y < 0 || newHead.x >= canvasSize || newHead.y >= canvasSize || snake.slice(1).some(segment => segment.x === newHead.x && segment.y === newHead.y)) {
+                    gameRunning = false;
+                    alert('Game Over');
+                    return;
+                }
+
+                // Draw food
+                context.fillStyle = 'red';
+                context.fillRect(food.x, food.y, gridSize, gridSize);
+
+                // Draw snake
+                context.fillStyle = 'green';
+                snake.forEach(segment => context.fillRect(segment.x, segment.y, gridSize, gridSize));
+
                 scoreDisplay.textContent = score;
                 movesDisplay.textContent = moves;
-                setTimeout(gameLoop, timeout);
-            }
+
+                if (gameRunning) {
+                    gameLoop();
+                }
+            }, timeout);
         }
-    
-        function updateSnakePosition() {
-            const newHead = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
-            snake.unshift(newHead);
-            snake.pop();
-        }
-    
-        function changeDirection(event) {
-            event.preventDefault(); // Prevent default behavior (e.g., scrolling)
-    
-            let key = event.key; // Get the key from the event object
-    
-            switch (key) {
+
+        // Event listeners for key controls
+        window.addEventListener('keydown', function(event) {
+            switch (event.key) {
                 case 'ArrowUp':
-                    if (direction.y === 0) {
-                        direction = { x: 0, y: -gridSize };
-                        moves++;
-                    }
+                    if (direction.y === 0) direction = { x: 0, y: -gridSize };
                     break;
                 case 'ArrowDown':
-                    if (direction.y === 0) {
-                        direction = { x: 0, y: gridSize };
-                        moves++;
-                    }
+                    if (direction.y === 0) direction = { x: 0, y: gridSize };
                     break;
                 case 'ArrowLeft':
-                    if (direction.x === 0) {
-                        direction = { x: -gridSize, y: 0 };
-                        moves++;
-                    }
+                    if (direction.x === 0) direction = { x: -gridSize, y: 0 };
                     break;
                 case 'ArrowRight':
-                    if (direction.x === 0) {
-                        direction = { x: gridSize, y: 0 };
-                        moves++;
-                    }
+                    if (direction.x === 0) direction = { x: gridSize, y: 0 };
                     break;
             }
-    
-            // Start game loop on first key press
-            if (!gameRunning) {
-                console.log('Starting game loop');
-                gameRunning = true;
-                gameLoop();
-            }
-        }
-    
-        function checkCollision() {
-            for (let i = 1; i < snake.length; i++) {
-                if (snake[i].x === snake[0].x && snake[i].y === snake[0].y) {
-                    return true;
-                }
-            }
-            if (snake[0].x < 0 || snake[0].x >= canvasSize || snake[0].y < 0 || snake[0].y >= canvasSize) {
-                return true;
-            }
-            return false;
-        }
-    
-        function checkFoodCollision() {
-            if (snake[0].x === food.x && snake[0].y === food.y) {
-                return true;
-            }
-            return false;
-        }
-    
-        function getRandomFoodPosition() {
-            let position;
-            do {
-                position = {
-                    x: Math.floor(Math.random() * gridCount) * gridSize,
-                    y: Math.floor(Math.random() * gridCount) * gridSize
-                };
-            } while (snake.some(segment => segment.x === position.x && segment.y === position.y));
-            return position;
-        }
-    
-        function drawGame() {
-            // Fill the game canvas with the desired background color
-            context.fillStyle = "#0099cc";
-            context.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
-    
-            context.beginPath();
-            context.moveTo(1, 1); // Start slightly inside the canvas
-            context.lineTo(1, canvasSize);
-            context.lineTo(canvasSize, canvasSize);
-            context.lineTo(canvasSize, 1);
-            context.closePath();
-            context.stroke();
-    
-            // Draw the pixel borders around the grid
-            context.strokeStyle = "rgba(255, 255, 255, 0.1)"; // Set pixel border color
-            context.lineWidth = 1; // Set the line width for pixel borders
-            for (let i = 0; i < gridCount; i++) {
+        });
 
-                for (let j = 0; j < gridCount; j++) {
-            context.strokeRect(i * gridSize, j * gridSize, gridSize, gridSize);
-        }
-    }
-
-    // Draw the snake
-    context.lineWidth = 1; // Reset line width for snake and eyes
-    snake.forEach((segment, index) => {
-        if (index === 0) {
-            // Draw eyes for the first segment
-            context.fillStyle = 'lime';
-            context.fillRect(segment.x, segment.y, gridSize, gridSize);
-
-            // Draw eyes (black pixels)
-            context.fillStyle = 'black';
-            context.fillRect(segment.x + 3, segment.y + 3, 4, 4); // Eye 1
-            context.fillRect(segment.x + 13, segment.y + 3, 4, 4); // Eye 2
-        } else {
-            // Draw the rest of the snake segments with a thinner outline
-            context.fillStyle = 'lime';
-            context.fillRect(segment.x, segment.y, gridSize, gridSize);
-        }
-    });
-
-    // Draw the food
-    context.fillStyle = '#ff3300'; // Set the color to #ff3300
-    context.fillRect(food.x, food.y, gridSize, gridSize);
-}
-
-function resetGame() {
-    snake = [{ x: gridCount / 2 * gridSize, y: gridCount / 2 * gridSize }];
-    direction = { x: 0, y: 0 };
-    food = getRandomFoodPosition();
-    score = 0;
-    moves = 0;
-    timeout = 100;
-    gameRunning = false;
-}
-
-function refreshGame() {
-    refreshBackground();
-    resetGame();
-    drawGame();
-    gameLoop();
-}
-
-function restartGame() {
-    resetGame();
-    drawGame();
-    gameLoop();
-    document.addEventListener('keydown', changeDirection); // Re-add event listener
-}
-
-refreshBackground();
-drawGame();
-</script>
-
-    
+        // Initial start of the game
+        refreshBackground();
+        startGameLoop();
+    </script>
 </body>
 </html>
