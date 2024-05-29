@@ -206,30 +206,38 @@
         let lastDirection = direction; // Track the last direction to determine reDirections
 
         // Touch controls
-        function handleTouchStart(event) {
-            const touch = event.touches[0];
-            const touchX = touch.clientX - gameCanvas.offsetLeft;
-            const touchY = touch.clientY - gameCanvas.offsetTop;
+function handleTouchStart(event) {
+    const touch = event.touches[0];
+    const touchX = touch.clientX - gameCanvas.offsetLeft;
+    const touchY = touch.clientY - gameCanvas.offsetTop;
 
-            const dx = touchX - snake[0].x;
-            const dy = touchY - snake[0].y;
+    const dx = touchX - snake[0].x;
+    const dy = touchY - snake[0].y;
 
-            if (Math.abs(dx) > Math.abs(dy)) {
-                if (dx > 0 && direction.x === 0) {
-                    nextDirection = { x: gridSize, y: 0 };
-                } else if (dx < 0 && direction.x === 0) {
-                    nextDirection = { x: -gridSize, y: 0 };
-                }
-            } else {
-                if (dy > 0 && direction.y === 0) {
-                    nextDirection = { x: 0, y: gridSize };
-                } else if (dy < 0 && direction.y === 0) {
-                    nextDirection = { x: 0, y: -gridSize };
-                }
-            }
+    if (Math.abs(dx) > Math.abs(dy)) {
+        if (dx > 0 && direction.x === 0) {
+            nextDirection = { x: gridSize, y: 0 };
+        } else if (dx < 0 && direction.x === 0) {
+            nextDirection = { x: -gridSize, y: 0 };
         }
+    } else {
+        if (dy > 0 && direction.y === 0) {
+            nextDirection = { x: 0, y: gridSize };
+        } else if (dy < 0 && direction.y === 0) {
+            nextDirection = { x: 0, y: -gridSize };
+        }
+    }
 
-        gameCanvas.addEventListener('touchstart', handleTouchStart);
+    // Increment reDirections if the direction changes
+    if (nextDirection.x !== lastDirection.x || nextDirection.y !== lastDirection.y) {
+        moves++;
+        movesDisplay.textContent = moves;
+        lastDirection = nextDirection;
+    }
+}
+
+gameCanvas.addEventListener('touchstart', handleTouchStart);
+
 
         // Refresh game function
         function refreshGame() {
