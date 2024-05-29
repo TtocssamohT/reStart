@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>reFresh Grid</title>
     <link rel="icon" href="https://ipfs.io/ipfs/QmcXRu9ZWwH3chUSJipNpwQXQPRcfPzTPPyk7pdDy49kEn" type="image/x-icon">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
     <style>
         body {
             display: flex;
@@ -44,24 +43,59 @@
         const gameContainer = document.querySelector('.game-container');
         const touchIndicator = document.querySelector('.touch-indicator');
         
-        const hammer = new Hammer(gameContainer);
-        hammer.get('swipe').set({ direction: Hammer.DIRECTION_ALL });
+        gameContainer.addEventListener('touchstart', handleTouchStart);
+        gameContainer.addEventListener('touchmove', handleTouchMove);
+        gameContainer.addEventListener('touchend', handleTouchEnd);
         
-        hammer.on('swipe', function(event) {
-            if (event.direction === Hammer.DIRECTION_LEFT) {
-                // Handle left swipe
-                console.log('Left swipe detected');
-            } else if (event.direction === Hammer.DIRECTION_RIGHT) {
-                // Handle right swipe
-                console.log('Right swipe detected');
-            } else if (event.direction === Hammer.DIRECTION_UP) {
-                // Handle up swipe
-                console.log('Up swipe detected');
-            } else if (event.direction === Hammer.DIRECTION_DOWN) {
-                // Handle down swipe
-                console.log('Down swipe detected');
+        let xStart = null;
+        let yStart = null;
+        
+        function handleTouchStart(event) {
+            xStart = event.touches[0].clientX;
+            yStart = event.touches[0].clientY;
+        }
+        
+        function handleTouchMove(event) {
+            event.preventDefault(); // Prevent scrolling
+            showTouchIndicator(event.touches[0].clientX, event.touches[0].clientY);
+        }
+        
+        function handleTouchEnd(event) {
+            const xEnd = event.changedTouches[0].clientX;
+            const yEnd = event.changedTouches[0].clientY;
+            const dx = xEnd - xStart;
+            const dy = yEnd - yStart;
+            
+            if (Math.abs(dx) > Math.abs(dy)) {
+                if (dx > 0) {
+                    // Right swipe
+                    console.log('Right swipe detected');
+                } else {
+                    // Left swipe
+                    console.log('Left swipe detected');
+                }
+            } else {
+                if (dy > 0) {
+                    // Down swipe
+                    console.log('Down swipe detected');
+                } else {
+                    // Up swipe
+                    console.log('Up swipe detected');
+                }
             }
-        });
+            
+            hideTouchIndicator();
+        }
+        
+        function showTouchIndicator(x, y) {
+            touchIndicator.style.display = 'block';
+            touchIndicator.style.left = x + 'px';
+            touchIndicator.style.top = y + 'px';
+        }
+        
+        function hideTouchIndicator() {
+            touchIndicator.style.display = 'none';
+        }
     </script>
 </body>
 </html>
