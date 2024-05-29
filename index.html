@@ -12,8 +12,8 @@
             align-items: center;
             height: 100vh;
             margin: 0;
-            background-color: black; /* Set background color to black */
-            overflow: hidden; /* Hide overflow to prevent scrollbar */
+            background-color: black;
+            overflow: hidden;
         }
 
         .content {
@@ -25,44 +25,43 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: space-between; /* Space between header, content, and footer */
-            z-index: 2; /* Ensure content is above the rain canvas */
-            overflow-y: auto; /* Enable vertical scrolling */
-            overscroll-behavior: contain; /* Prevent scroll chaining */
+            justify-content: space-between;
+            z-index: 2;
+            overflow-y: auto;
+            overscroll-behavior: contain;
         }
 
         .item {
-            /* margin-bottom: 20px; */ /* Remove margin to ensure the footer meets the bottom of the container */
         }
 
         .header {
-            width: 45%; /* Reduce width */
+            width: 45%;
             z-index: 3;
         }
 
         .footer {
-            width: 50%; /* Reduce width */
+            width: 50%;
             z-index: 1;
-            position: relative; /* Ensure position is relative */
-            align-self: flex-end; /* Align footer to the bottom of the container */
-            margin-top: auto; /* Push footer to the bottom of the container */
+            position: relative;
+            align-self: flex-end;
+            margin-top: auto;
         }
 
         .refresh-button {
-            font-size: 25px; /* Adjusted font size */
+            font-size: 25px;
             font-weight: bold;
-            padding: 18.75px 37.5px; /* Adjusted padding */
-            background-color: #4CAF50; /* Green color */
+            padding: 18.75px 37.5px;
+            background-color: #4CAF50;
             color: white;
-            border: 2px solid black; /* Set black border */
-            border-radius: 18.75px; /* Rounded corners */
+            border: 2px solid black;
+            border-radius: 18.75px;
             cursor: pointer;
             text-decoration: none;
-            position: relative; /* Required for absolute positioning of pseudo-elements */
-            overflow: hidden; /* Ensure pseudo-elements stay within button boundaries */
-            transition: background-color 0.3s, box-shadow 0.3s, border-color 0.3s; /* Smooth transition on hover */
-            font-family: "Pixelify Sans", sans-serif; /* Apply custom font to button */
-            margin-top: 20px; /* Add margin-top */
+            position: relative;
+            overflow: hidden;
+            transition: background-color 0.3s, box-shadow 0.3s, border-color 0.3s;
+            font-family: "Pixelify Sans", sans-serif;
+            margin-top: 20px;
         }
 
         .refresh-button::before,
@@ -73,12 +72,12 @@
             height: 100%;
             top: 0;
             left: 0;
-            z-index: -1; /* Behind the button content */
+            z-index: -1;
         }
 
         .refresh-button::before {
-            border: 5px solid white; /* Set white border with increased thickness */
-            border-radius: 18.75px; /* Match button's border radius */
+            border: 5px solid white;
+            border-radius: 18.75px;
         }
 
         .restart-button {
@@ -87,39 +86,39 @@
             border: 2px solid #0099cc;
         }
 
-        /* Updated style for Magmascan link */
         .magmascan-link {
-            font-size: 50px; /* Font size */
-            color: transparent; /* Transparent text color */
-            text-shadow: 0 0 0 #d04421, 0 0 20px #d04421; /* Ring effect with color #d04421 */
-            background-color: black; /* Background color */
-            padding: 0.5rem 1rem; /* Padding */
-            border-radius: 5px; /* Border radius */
-            transition: text-shadow 0.3s; /* Smooth transition */
-            font-family: "Pixelify Sans", sans-serif; /* Apply custom font to link */
-            position: absolute; /* Required for positioning */
-            top: 20px; /* Adjust top spacing */
-            left: 50%; /* Center horizontally */
-            transform: translateX(-50%); /* Center horizontally */
+            font-size: 50px;
+            color: transparent;
+            text-shadow: 0 0 0 #d04421, 0 0 20px #d04421;
+            background-color: black;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: text-shadow 0.3s;
+            font-family: "Pixelify Sans", sans-serif;
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
         }
 
         .magmascan-link:hover {
-            text-shadow: 0 0 0 transparent, 0 0 20px #d04421; /* Change text shadow on hover */
+            text-shadow: 0 0 0 transparent, 0 0 20px #d04421;
         }
 
         .container {
-            text-align: center; /* Center the content horizontally */
-            position: relative; /* Ensure proper stacking context */
-            z-index: 2; /* Ensure container is above the rain canvas */
+            text-align: center;
+            position: relative;
+            z-index: 2;
         }
+
         .direction-button-UD img {
-            width: 20px; /* Adjust the width */
-            height: 40px; /* Adjust the height */
+            width: 20px;
+            height: 40px;
         }
 
         .direction-button-LR img {
-            width: 60px; /* Adjust the width */
-            height: 50px; /* Adjust the height */
+            width: 60px;
+            height: 50px;
         }
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -160,7 +159,6 @@
     </div>
     
     <script>
-        // Background refresh function
         function refreshBackground() {
             let canvas = document.createElement('canvas');
     
@@ -183,7 +181,6 @@
             document.body.style.backgroundImage = `url(${imageDataURL})`;
         }
     
-        // PhixelSnake game setup
         const gameCanvas = document.getElementById('gameCanvas');
         const context = gameCanvas.getContext('2d');
         const gridSize = 20;
@@ -251,7 +248,6 @@
             touchStartX = 0;
             touchStartY = 0;
     
-            // Start game loop on first touch move
             if (!gameRunning) {
                 console.log('Starting game loop');
                 gameRunning = true;
@@ -284,10 +280,8 @@
         }
     
         function changeDirection(event) {
-            event.preventDefault(); // Prevent default behavior (e.g., scrolling)
-    
-            let key = event.key; // Get the key from the event object
-    
+            event.preventDefault();
+            let key = event.key;
             switch(key) {
                 case 'ArrowUp':
                     if (direction.y === 0) {
@@ -314,8 +308,6 @@
                     }
                     break;
             }
-    
-            // Start game loop on first key press
             if (!gameRunning) {
                 console.log('Starting game loop');
                 gameRunning = true;
@@ -354,48 +346,41 @@
         }
     
         function drawGame() {
-            // Fill the game canvas with the desired background color
             context.fillStyle = "#0099cc";
             context.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
     
             context.beginPath();
-            context.moveTo(1, 1); // Start slightly inside the canvas
+            context.moveTo(1, 1);
             context.lineTo(1, canvasSize);
             context.lineTo(canvasSize, canvasSize);
             context.lineTo(canvasSize, 1);
             context.closePath();
             context.stroke();
     
-            // Draw the pixel borders around the grid
-            context.strokeStyle = "rgba(255, 255, 255, 0.1)"; // Set pixel border color
-            context.lineWidth = 1; // Set the line width for pixel borders
+            context.strokeStyle = "rgba(255, 255, 255, 0.1)";
+            context.lineWidth = 1;
             for (let i = 0; i < gridCount; i++) {
                 for (let j = 0; j < gridCount; j++) {
                     context.strokeRect(i * gridSize, j * gridSize, gridSize, gridSize);
                 }
             }
     
-            // Draw the snake
-            context.lineWidth = 1; // Reset line width for snake and eyes
+            context.lineWidth = 1;
             snake.forEach((segment, index) => {
                 if (index === 0) {
-                    // Draw eyes for the first segment
                     context.fillStyle = 'lime';
                     context.fillRect(segment.x, segment.y, gridSize, gridSize);
     
-                    // Draw eyes (black pixels)
                     context.fillStyle = 'black';
-                    context.fillRect(segment.x + 3, segment.y + 3, 4, 4); // Eye 1
-                    context.fillRect(segment.x + 13, segment.y + 3, 4, 4); // Eye 2
+                    context.fillRect(segment.x + 3, segment.y + 3, 4, 4);
+                    context.fillRect(segment.x + 13, segment.y + 3, 4, 4);
                 } else {
-                    // Draw the rest of the snake segments with a thinner outline
                     context.fillStyle = 'lime';
                     context.fillRect(segment.x, segment.y, gridSize, gridSize);
                 }
             });
     
-            // Draw the food
-            context.fillStyle = '#ff3300'; // Set the color to #ff3300
+            context.fillStyle = '#ff3300';
             context.fillRect(food.x, food.y, gridSize, gridSize);
         }
     
@@ -420,7 +405,7 @@
             resetGame();
             drawGame();
             gameLoop();
-            document.addEventListener('keydown', changeDirection); // Re-add event listener
+            document.addEventListener('keydown', changeDirection);
         }
     
         refreshBackground();
