@@ -16,86 +16,259 @@
             overflow: hidden;
         }
 
-        .game-container {
-            position: relative;
-            width: 300px;
-            height: 300px;
-            background-color: #333;
-        }
-
-        .touch-indicator {
-            position: absolute;
+        .content {
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(255, 255, 255, 0.5);
-            display: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 2;
+            overflow-y: auto;
+            overscroll-behavior: contain;
+        }
+
+        .item {
+            margin-bottom: 20px;
+        }
+
+        .header {
+            width: 45%;
+            z-index: 3;
+        }
+
+        .footer {
+            width: 50%;
+            z-index: 1;
+            position: relative;
+            align-self: flex-end;
+            margin-top: auto;
+        }
+
+        .refresh-button {
+            font-size: 25px;
+            font-weight: bold;
+            padding: 18.75px 37.5px;
+            background-color: #4CAF50;
+            color: white;
+            border: 2px solid black;
+            border-radius: 18.75px;
+            cursor: pointer;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+            transition: background-color 0.3s, box-shadow 0.3s, border-color 0.3s;
+            font-family: "Pixelify Sans", sans-serif;
+            margin-top: 20px;
+        }
+
+        .refresh-button::before,
+        .refresh-button::after {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        .refresh-button::before {
+            border: 5px solid white;
+            border-radius: 18.75px;
+        }
+
+        .restart-button {
+            background-color: #fff000;
+            color: #0099cc;
+            border: 2px solid #0099cc;
+        }
+
+        .magmascan-link {
+            font-size: 50px;
+            color: transparent;
+            text-shadow: 0 0 0 #d04421, 0 0 20px #d04421;
+            background-color: black;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: text-shadow 0.3s;
+            font-family: "Pixelify Sans", sans-serif;
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .magmascan-link:hover {
+            text-shadow: 0 0 0 transparent, 0 0 20px #d04421;
+        }
+
+        .container {
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .direction-button-UD img {
+            width: 20px;
+            height: 40px;
+        }
+
+        .direction-button-LR img {
+            width: 60px;
+            height: 50px;
         }
     </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="game-container">
-        <div class="touch-indicator"></div>
+    <div class="content">
+        <canvas id="pixelCanvas" style="position: fixed; top: 0; left: 0; pointer-events: none; z-index: -1;"></canvas>
+
+        <div class="container">
+            <div class="item">
+                <button class="refresh-button" onclick="refreshGame()">reFresh</button>
+                <button class="restart-button refresh-button" onclick="restartGame()">reStart</button>
+            </div>
+            <div style="height: 20px;"></div> <!-- Buffer above Magmascan link -->
+            <button class="score-button" style="border: 2px solid #0099cc; background-color: #ffff00; border-radius: 18.75px; padding: 18.75px 37.5px;">
+                <div style="font-family: 'Pixelify Sans', sans-serif; font-size: 24px; color: #0099cc; font-weight: bold;">
+                    Score: <span id="score">0</span>
+                </div>
+                <div style="font-family: 'Pixelify Sans', sans-serif; font-size: 24px; color: #0099cc; font-weight: bold;">
+                    reDiretions: <span id="moves">0</span>
+                </div>
+            </button>
+            <div style="height: 20px;"></div> <!-- Buffer above Magmascan link -->
+            <div class="item" style="display: flex; flex-direction: column; align-items: center;">
+                <canvas id="gameCanvas" width="400" height="400"></canvas>
+                <div style="height: 20px;"></div> <!-- Buffer above Magmascan link -->
+                <div class="direction-buttons">
+                    <button class="direction-button-UD" onclick="moveUp()"><img src="up-arrow.png" alt="Up"></button>
+                    <button class="direction-button-UD" onclick="moveDown()"><img src="down-arrow.png" alt="Down"></button>
+                    <button class="direction-button-LR" onclick="moveLeft()"><img src="left-arrow.png" alt="Left"></button>
+                    <button class="direction-button-LR" onclick="moveRight()"><img src="right-arrow.png" alt="Right"></button>
+                </div>
+            </div>
+        </div>
     </div>
-    
+
     <script>
-        const gameContainer = document.querySelector('.game-container');
-        const touchIndicator = document.querySelector('.touch-indicator');
-        
-        gameContainer.addEventListener('touchstart', handleTouchStart);
-        gameContainer.addEventListener('touchmove', handleTouchMove);
-        gameContainer.addEventListener('touchend', handleTouchEnd);
-        
-        let xStart = null;
-        let yStart = null;
-        
-        function handleTouchStart(event) {
-            xStart = event.touches[0].clientX;
-            yStart = event.touches[0].clientY;
+        // Variables and constants
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+        const scoreElement = document.getElementById("score");
+        const movesElement = document.getElementById("moves");
+        let score = 0;
+        let moves = 0;
+        let isGameRunning = false;
+
+        // Game initialization
+        function initGame() {
+            score = 0;
+            moves = 0;
+            isGameRunning = true;
+            scoreElement.textContent = score;
+            movesElement.textContent = moves;
+            drawGrid();
         }
-        
-        function handleTouchMove(event) {
-            event.preventDefault(); // Prevent scrolling
-            showTouchIndicator(event.touches[0].clientX, event.touches[0].clientY);
+
+        // Draw the game grid
+        function drawGrid() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "green";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
         }
-        
-        function handleTouchEnd(event) {
-            const xEnd = event.changedTouches[0].clientX;
-            const yEnd = event.changedTouches[0].clientY;
-            const dx = xEnd - xStart;
-            const dy = yEnd - yStart;
-            
-            if (Math.abs(dx) > Math.abs(dy)) {
-                if (dx > 0) {
-                    // Right swipe
-                    console.log('Right swipe detected');
+
+        // Movement functions
+        function moveUp() {
+            if (!isGameRunning) return;
+            moves++;
+            movesElement.textContent = moves;
+            // Add logic for moving up
+        }
+
+        function moveDown() {
+            if (!isGameRunning) return;
+            moves++;
+            movesElement.textContent = moves;
+            // Add logic for moving down
+        }
+
+        function moveLeft() {
+            if (!isGameRunning) return;
+            moves++;
+            movesElement.textContent = moves;
+            // Add logic for moving left
+        }
+
+        function moveRight() {
+            if (!isGameRunning) return;
+            moves++;
+            movesElement.textContent = moves;
+            // Add logic for moving right
+        }
+
+        // Refresh game
+        function refreshGame() {
+            drawGrid();
+        }
+
+        // Restart game
+        function restartGame() {
+            initGame();
+        }
+
+        // Touch event handling
+        let startX = 0;
+        let startY = 0;
+        canvas.addEventListener("touchstart", handleTouchStart, false);
+        canvas.addEventListener("touchmove", handleTouchMove, false);
+
+        function handleTouchStart(evt) {
+            const firstTouch = evt.touches[0];
+            startX = firstTouch.clientX;
+            startY = firstTouch.clientY;
+        }
+
+        function handleTouchMove(evt) {
+            if (!isGameRunning) return;
+            if (!startX || !startY) return;
+
+            const currentX = evt.touches[0].clientX;
+            const currentY = evt.touches[0].clientY;
+            const diffX = startX - currentX;
+            const diffY = startY - currentY;
+
+            if (Math.abs(diffX) > Math.abs(diffY)) {
+                // Horizontal swipe
+                if (diffX > 0) {
+                    moveLeft();
                 } else {
-                    // Left swipe
-                    console.log('Left swipe detected');
+                    moveRight();
                 }
             } else {
-                if (dy > 0) {
-                    // Down swipe
-                    console.log('Down swipe detected');
+                // Vertical swipe
+                if (diffY > 0) {
+                    moveUp();
                 } else {
-                    // Up swipe
-                    console.log('Up swipe detected');
+                    moveDown();
                 }
             }
-            
-            hideTouchIndicator();
+
+            startX = 0;
+            startY = 0;
         }
-        
-        function showTouchIndicator(x, y) {
-            touchIndicator.style.display = 'block';
-            touchIndicator.style.left = x + 'px';
-            touchIndicator.style.top = y + 'px';
-        }
-        
-        function hideTouchIndicator() {
-            touchIndicator.style.display = 'none';
-        }
+
+        // Initialize the game when the page loads
+        window.onload = () => {
+            initGame();
+        };
     </script>
 </body>
 </html>
