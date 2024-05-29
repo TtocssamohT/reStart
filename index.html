@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>reFresh Grid</title>
-    <link rel="icon" href="https://ipfs.io/ipfs/Qmc8wzn75PGZBQw693kDD6rfnkRWaoAy3donXT7KCQjSR7" type="image/x-icon">
+    <link rel="icon" href="https://ipfs.io/ipfs/QmcXRu9ZWwH3chUSJipNpwQXQPRcfPzTPPyk7pdDy49kEn" type="image/x-icon">
     <style>
         body {
             display: flex;
@@ -130,7 +130,8 @@
     <div class="content">
         <canvas id="pixelCanvas" style="position: fixed; top: 0; left: 0; pointer-events: none; z-index: -1;"></canvas>
     
-        
+        <div class="container">
+                       
             <div class="item">
                 <button class="refresh-button" onclick="refreshGame()">reFresh</button>
                 <button class="restart-button refresh-button" onclick="restartGame()">reStart</button>
@@ -141,7 +142,7 @@
                     Score: <span id="score">0</span>
                 </div>
                 <div style="font-family: 'Pixelify Sans', sans-serif; font-size: 24px; color: #0099cc; font-weight: bold;">
-                    reDiretions: <span id="moves">0</span>
+                    reDirections: <span id="moves">0</span>
                 </div>
                 
             </button>
@@ -186,7 +187,7 @@
         const gameCanvas = document.getElementById('gameCanvas');
         const context = gameCanvas.getContext('2d');
         const gridSize = 20;
-        const gridCount = 10;
+        const gridCount = 20;
         const canvasSize = gridSize * gridCount;
         gameCanvas.width = canvasSize;
         gameCanvas.height = canvasSize;
@@ -199,8 +200,55 @@
         let scoreDisplay = document.getElementById('score');
         let movesDisplay = document.getElementById('moves');
         let timeout = 100;
+        let gameRunning = false;
     
         document.addEventListener('keydown', changeDirection);
+    
+        let touchStartX = 0;
+        let touchStartY = 0;
+    
+        document.addEventListener('touchstart', handleTouchStart, false);
+        document.addEventListener('touchmove', handleTouchMove, false);
+    
+        function handleTouchStart(evt) {
+            touchStartX = evt.touches[0].clientX;
+            touchStartY = evt.touches[0].clientY;
+        }
+    
+        function handleTouchMove(evt) {
+            if (!touchStartX || !touchStartY) {
+                return;
+            }
+    
+            let touchEndX = evt.touches[0].clientX;
+            let touchEndY = evt.touches[0].clientY;
+    
+            let diffX = touchStartX - touchEndX;
+            let diffY = touchStartY - touchEndY;
+    
+            if (Math.abs(diffX) > Math.abs(diffY)) {
+                if (diffX > 0) {
+                    changeDirection({ key: 'ArrowLeft' });
+                } else {
+                    changeDirection({ key: 'ArrowRight' });
+                }
+            } else {
+                if (diffY > 0) {
+                    changeDirection({ key: 'ArrowUp' });
+                } else {
+                    changeDirection({ key: 'ArrowDown' });
+                }
+            }
+    
+            touchStartX = 0;
+            touchStartY = 0;
+    
+            // Start game loop on first touch move
+            if (!gameRunning) {
+                gameRunning = true;
+                gameLoop();
+            }
+        }
     
         function gameLoop() {
             updateSnakePosition();
@@ -212,7 +260,6 @@
                     score++;
                     snake.push({...snake[snake.length - 1]});
                     food = getRandomFoodPosition();
-    
                 }
                 drawGame();
                 scoreDisplay.textContent = score;
@@ -257,6 +304,12 @@
                         moves++;
                     }
                     break;
+            }
+    
+            // Start game loop on first key press
+            if (!gameRunning) {
+                gameRunning = true;
+                gameLoop();
             }
         }
     
@@ -343,6 +396,7 @@
             score = 0;
             moves = 0;
             timeout = 100;
+            gameRunning = false;
         }
     
         function refreshGame() {
@@ -361,7 +415,6 @@
     
         refreshBackground();
         drawGame();
-        gameLoop();
     </script>
     
 </body>
