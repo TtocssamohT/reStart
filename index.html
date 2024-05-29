@@ -124,7 +124,7 @@
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Pixelify        Sans:wght@400..700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="content">
@@ -153,7 +153,9 @@
                
                 <canvas id="gameCanvas" width="400" height="400"></canvas>
                 <div style="height: 20px;"></div> <!-- Buffer above Magmascan link -->
-            </div>
+           
+            
+           
         </div> 
     </div>
     
@@ -316,8 +318,7 @@
             // Start game loop on first key press
             if (!gameRunning) {
                 console.log('Starting game loop');
-                gameRunning = true
-                ;
+                gameRunning = true;
                 gameLoop();
             }
         }
@@ -427,4 +428,3 @@
     </script>
 </body>
 </html>
-
