@@ -211,12 +211,14 @@
         gameCanvas.addEventListener('touchmove', handleTouchMove, false);
     
         function handleTouchStart(evt) {
+            console.log('Touch start detected');
             const touch = evt.touches[0];
             touchStartX = touch.clientX;
             touchStartY = touch.clientY;
         }
     
         function handleTouchMove(evt) {
+            console.log('Touch move detected');
             if (!touchStartX || !touchStartY) {
                 return;
             }
@@ -230,14 +232,18 @@
     
             if (Math.abs(diffX) > Math.abs(diffY)) {
                 if (diffX > 0) {
+                    console.log('Swipe left detected');
                     changeDirection({ key: 'ArrowLeft' });
                 } else {
+                    console.log('Swipe right detected');
                     changeDirection({ key: 'ArrowRight' });
                 }
             } else {
                 if (diffY > 0) {
+                    console.log('Swipe up detected');
                     changeDirection({ key: 'ArrowUp' });
                 } else {
+                    console.log('Swipe down detected');
                     changeDirection({ key: 'ArrowDown' });
                 }
             }
@@ -247,6 +253,7 @@
     
             // Start game loop on first touch move
             if (!gameRunning) {
+                console.log('Starting game loop');
                 gameRunning = true;
                 gameLoop();
             }
@@ -310,6 +317,7 @@
     
             // Start game loop on first key press
             if (!gameRunning) {
+                console.log('Starting game loop');
                 gameRunning = true;
                 gameLoop();
             }
