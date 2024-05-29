@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>reFresh Grid</title>
     <link rel="icon" href="https://ipfs.io/ipfs/QmcXRu9ZWwH3chUSJipNpwQXQPRcfPzTPPyk7pdDy49kEn" type="image/x-icon">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
     <style>
         body {
             display: flex;
@@ -35,22 +36,32 @@
     </style>
 </head>
 <body>
-    <div class="game-container" ontouchstart="handleTouchStart(event)" ontouchmove="handleTouchMove(event)">
+    <div class="game-container">
         <div class="touch-indicator"></div>
     </div>
     
     <script>
-        function handleTouchStart(event) {
-            const touchIndicator = document.querySelector('.touch-indicator');
-            touchIndicator.style.display = 'block';
-        }
+        const gameContainer = document.querySelector('.game-container');
+        const touchIndicator = document.querySelector('.touch-indicator');
         
-        function handleTouchMove(event) {
-            const touchIndicator = document.querySelector('.touch-indicator');
-            const touch = event.touches[0];
-            touchIndicator.style.left = touch.clientX + 'px';
-            touchIndicator.style.top = touch.clientY + 'px';
-        }
+        const hammer = new Hammer(gameContainer);
+        hammer.get('swipe').set({ direction: Hammer.DIRECTION_ALL });
+        
+        hammer.on('swipe', function(event) {
+            if (event.direction === Hammer.DIRECTION_LEFT) {
+                // Handle left swipe
+                console.log('Left swipe detected');
+            } else if (event.direction === Hammer.DIRECTION_RIGHT) {
+                // Handle right swipe
+                console.log('Right swipe detected');
+            } else if (event.direction === Hammer.DIRECTION_UP) {
+                // Handle up swipe
+                console.log('Up swipe detected');
+            } else if (event.direction === Hammer.DIRECTION_DOWN) {
+                // Handle down swipe
+                console.log('Down swipe detected');
+            }
+        });
     </script>
 </body>
 </html>
